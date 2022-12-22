@@ -2,6 +2,7 @@ from utils import *
 import math
 from decimal import Decimal as Dec
 from decimal import getcontext
+import random
 
 MEM = [[0 for i in range(21)] for j in range(8192)]
 
@@ -11,6 +12,12 @@ R0 = MEM[1]
 def init():
     for b in MEM:
         set(b,[1,1,1],20,3)
+        
+def gaddr():
+    ad = random.randint(100,511)
+    if (gets(MEM[ad],20,3) != '111'):
+        gaddr()
+    return ad
         
 def xprint(b):
     print("[0,............................1,............................2]")
@@ -247,27 +254,33 @@ def subf(d,d1,d2,ad1,ad2,cry=0):
         normal(d)
     set(MEM[d],[0,0,1],20,3)
     
-def ADD(d,d1,d2,ad1,ad2,cry=0):
+def ADD(d,ad1,ad2,cry=0):
     adm1 = int(gets(MEM[ad1],8,9),2)
     adm2 = int(gets(MEM[ad2],8,9),2)
     sm1 = MEM[adm1][3]
     sm2 = MEM[adm2][3]
+    d1 = gaddr()
+    d2 = gaddr()
     if (sm1 == sm2):
         addf(d,d1,d2,ad1,ad2,cry=0)
     else:
         subf(d,d1,d2,ad1,ad2,cry=0)
         
-def SUB(d,d1,d2,ad1,ad2,cry=0):
+def SUB(d,ad1,ad2,cry=0):
     adm1 = int(gets(MEM[ad1],8,9),2)
     adm2 = int(gets(MEM[ad2],8,9),2)
     sm1 = MEM[adm1][3]
     sm2 = MEM[adm2][3]
+    d1 = gaddr()
+    d2 = gaddr()
     if (sm1 != sm2):
         addf(d,d1,d2,ad1,ad2,cry=0)
     else:
         subf(d,d1,d2,ad1,ad2,cry=0)
     
 ### TESTS
+
+init()
 
 fsetv(100,110,9)
 fsetv(101,115,-3.9375)
@@ -290,7 +303,7 @@ xprint(MEM[116])
 pprint(101)
 
 print('Addition')
-ADD(105,120,121,100,101)
-xprint(MEM[120])
-xprint(MEM[121])
+ADD(105,100,101)
+#xprint(MEM[120])
+#xprint(MEM[121])
 pprint(105)
