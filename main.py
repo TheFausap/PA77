@@ -282,7 +282,7 @@ def SUB(d,ad1,ad2,cry=0):
 
 init()
 
-fsetv(100,110,9)
+fsetv(100,110,-9)
 fsetv(101,115,-3.9375)
 
 print('Before normalization a1')

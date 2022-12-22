@@ -116,4 +116,4 @@ letter alphabet is used, the other characters remain the same.
 - MVX DDDD,SSSS : move one word from SSSS to DDDD. SSSS is zeroed and the new content in DDDD is (SSSS) XOR (DDDD)
 - NOT AAAA : all bits are inverted at location AAAA
 - MVF DDDD,SSSS : move two words at SSSS,SSSS+1 to DDDD,DDDD+1. SSSS is zeroed and the previous content of DDDD is destroyed
-- 
+- FLD AAAA : load a floating point value (in the next two words, exp and mant) at AAAA. The addresses of the exp and mant are handled automatically by the system
