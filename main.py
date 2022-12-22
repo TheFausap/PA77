@@ -5,13 +5,13 @@ from decimal import getcontext
 
 MEM = [[0 for i in range(21)] for j in range(8192)]
 
-AC = [0 for i in range(42)]
-MQ = [0 for i in range(42)]
-EXR7 = [0 for i in range(42)]
-LR = [0 for i in range(12)]
-XR6 = MEM[5]
-XR7 = MEM[6]
+PC = MEM[0]
+R0 = MEM[1]
 
+def init():
+    for b in MEM:
+        set(b,[1,1,1],20,3)
+        
 def xprint(b):
     print("[0,............................1,............................2]")
     print("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0]")
@@ -168,6 +168,8 @@ def addf(d,d1,d2,ad1,ad2,cry=0):
     h = m3[0]
     m = m3[1:]
     set(MEM[d],[0,1,0],20,3)
+    set(MEM[d1],[0,0,0],20,3)
+    set(MEM[d2],[0,0,0],20,3)
     set(MEM[d],tobin(d1,9),17,9)
     set(MEM[d],tobin(d2,9),8,9)
     set(MEM[d2],[s],17,1)
@@ -233,6 +235,8 @@ def subf(d,d1,d2,ad1,ad2,cry=0):
     h = m3[0]
     m = m3[1:]
     set(MEM[d],[0,1,0],20,3)
+    set(MEM[d1],[0,0,0],20,3)
+    set(MEM[d2],[0,0,0],20,3)
     set(MEM[d],tobin(d1,9),17,9)
     set(MEM[d],tobin(d2,9),8,9)
     set(MEM[d2],[s],17,1)
