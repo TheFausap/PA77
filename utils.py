@@ -73,8 +73,16 @@ def gets(b,s,nb):
 def tostr(b):
     return ''.join(str(k) for k in b)
 
-def intf(s):
+def _intf(s):
     return int(s, 2) / 2.**(len(s))
+
+def intf(s):
+    j = -1
+    r = 0
+    for b in s:
+        r += b * 2**j
+        j -= 1
+    return r
     
 def zero(b):
     for y in range(len(b)):
@@ -163,10 +171,40 @@ def s1(b1,b2,c):
         c = 0
     return (r,c)
     
-# integer addition.
+# integer addition used in floating point add
 # sign in the first position (0)
+# hidden bit is the second position (1)
 # returns the addition
-def _addi(ba1,ba2,cry=0):
+def addi(ba1,ba2,cry=0):
+    l1 = len(ba1)
+    l2 = len(ba2)
+    if (l1 < l2):
+        ba1 = [0 for k in range(l2-l1)] + ba1
+    elif (l1 > l2):
+        ba2 = [0 for k in range(l1-l2)] + ba2
+    r = [0 for k in range(l1)]
+    z = [0 for k in range(l1)]
+    if (ba1[0] != ba2[0]):
+        for y in range(l1-1,-1,-1):
+            (r[y],cry) = a1(ba2[y],ba1[y],cry)
+        if (cry == 1):
+            for y in range(l1-1,-1,-1):
+                (r[y],cry) = a1(r[y],z[y],cry)
+    else:
+        for y in range(l1-1,-1,-1):
+            (r[y],cry) = a1(ba1[y],ba2[y],cry)
+        if (ba1[0] != ba2[0]):
+            if (cry == 1):
+                print("addi UND")
+            else:
+                print("addi OVR")
+        else:
+            if (cry == 1):
+                for y in range(l1-1,-1,-1):
+                    (r[y],cry) = a1(r[y],z[y],cry)
+    return (r[0],r[1],r[2:])
+
+def addi2(ba1,ba2,cry=0):
     l1 = len(ba1)
     l2 = len(ba2)
     if (l1 < l2):

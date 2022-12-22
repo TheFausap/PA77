@@ -22,14 +22,14 @@ def pprint(ad,f=0):
         m = get(MEM[ad],16,17)
         s = '' if (MEM[ad][3]==0) else '-'
         v = 0
-        if (s == '-'):
-            c1(m)
+        #if (s == '-'):
+        #    c1(m)
         if (f == 0):
             v = int(tostr(m),2)
         elif (f == 2):
-            v = intf(tostr(m))
+            v = intf(m)
         elif (f == 1):
-            v = 1+intf(tostr(m))
+            v = 1+intf(m)
         print(s,v,sep='')
     elif (tag(MEM[ad]) == 2):
         ade = int(gets(MEM[ad],17,9),2)
@@ -50,14 +50,14 @@ def normal(ad):
     exb = MEM[ade][4:]
     sm = MEM[adm][3]
     se = MEM[ade][3]
-    if (sm == 1):
-        c1(mb)
+    #if (sm == 1):
+        #c1(mb)
     while(mb[0] != 1):
         mb = shl(mb)
         de += 1
     mb = shl(mb)
-    if (sm == 1):
-        c1(mb)
+    #if (sm == 1):
+        #c1(mb)
     set(MEM[adm],mb,16,17)
     re = int(tostr(exb),2) if (se == 0) else -1*int(tostr(c1(exb)),2)
     re -= de
@@ -67,6 +67,7 @@ def normal(ad):
         set(MEM[ade],[1],17,1)
     set(MEM[ade],exb,16,17)
     set(MEM[ad],[0,0,1],20,3)
+
     
 def fsetv(ad,adf,v):
     i = 0
@@ -94,7 +95,6 @@ def fsetv(ad,adf,v):
         j += 1
         i += 1
         vdec -= int(vdec)
-    
     if ((s==0) and (int(v) != 0)):
         exp = len(bint)
         expb = tobin(exp,17)
@@ -107,12 +107,12 @@ def fsetv(ad,adf,v):
         exp = len(bint)
         expb = tobin(exp,17)
         mant = bint+bdec
-        c1(mant)
+        #c1(mant)
     elif ((s==1) and (int(v) == 0)):
         exp = 0
         expb = tobin(exp,17)
         mant = bdec
-        c1(mant)
+        #c1(mant)
     set(MEM[ad],[0,1,0],20,3)
     set(MEM[adf],[0,0,0],20,3)
     set(MEM[adf+1],[0,0,0],20,3)
@@ -121,19 +121,160 @@ def fsetv(ad,adf,v):
     set(MEM[adf],expb,16,17)
     set(MEM[adf+1],[s],17,1)
     set(MEM[adf+1],mant,16,17)
+        
+def addf(d,d1,d2,ad1,ad2,cry=0):
+    ade1 = int(gets(MEM[ad1],17,9),2)
+    adm1 = int(gets(MEM[ad1],8,9),2)
+    ade2 = int(gets(MEM[ad2],17,9),2)
+    adm2 = int(gets(MEM[ad2],8,9),2)
+    se1 = MEM[ade1][3]
+    sm1 = MEM[adm1][3]
+    ex1 = int(gets(MEM[ade1],16,17),2) if (se1 == 0) else -1*int(tostr(c1(get(MEM[ade1],16,17))),2)
+    m1 = get(MEM[adm1],16,17) # mantissa
+    m1 = [1] + m1
+    se2 = MEM[ade2][3]
+    sm2 = MEM[adm2][3]
+    ex2 = int(gets(MEM[ade2],16,17),2) if (se2 == 0) else -1*int(tostr(c1(get(MEM[ade2],16,17))),2)
+    m2 = get(MEM[adm2],16,17) # mantissa
+    m2 = [1] + m2
+    ex = ex1
+    if (ex1 > ex2):
+        while (ex2 < ex1):
+            m2 = shr(m2)
+            ex2 += 1
+    elif (ex1 < ex2):
+        while (ex1 < ex2):
+            m1 = shr(m1)
+            ex1 += 1
+        ex = ex2
+    # addition of mantissa
+    lm = len(m1)
+    m3 = [0 for k in range(lm)]
+    z = [0 for k in range(lm)]
+    s = 0
+    for y in range(lm-1,-1,-1):
+        (m3[y],cry) = a1(m1[y],m2[y],cry)
+    if ((sm1 == 1) and (sm2 == 1)):
+        if (cry == 1):
+            for y in range(lm-1,-1,-1):
+                (m3[y],cry) = a1(m3[y],z[y],cry)
+        s = 1
+    if (cry == 1):
+    # overflow into hidden bit
+        m3 = shr(m3)
+        ex += 1
+        m3[0] = 1
+    
+    h = m3[0]
+    m = m3[1:]
+    set(MEM[d],[0,1,0],20,3)
+    set(MEM[d],tobin(d1,9),17,9)
+    set(MEM[d],tobin(d2,9),8,9)
+    set(MEM[d2],[s],17,1)
+    set(MEM[d2],m,16,17)
+    set(MEM[d1],tobin(ex,17),16,17)
+    
+    if (h == 0):
+        normal(d)
+    set(MEM[d],[0,0,1],20,3)
+    
+def subf(d,d1,d2,ad1,ad2,cry=0):
+    ade1 = int(gets(MEM[ad1],17,9),2)
+    adm1 = int(gets(MEM[ad1],8,9),2)
+    ade2 = int(gets(MEM[ad2],17,9),2)
+    adm2 = int(gets(MEM[ad2],8,9),2)
+    se1 = MEM[ade1][3]
+    sm1 = MEM[adm1][3]
+    ex1 = int(gets(MEM[ade1],16,17),2) if (se1 == 0) else -1*int(tostr(c1(get(MEM[ade1],16,17))),2)
+    m1 = get(MEM[adm1],16,17) # mantissa
+    m1 = [1] + m1
+    se2 = MEM[ade2][3]
+    sm2 = MEM[adm2][3]
+    ex2 = int(gets(MEM[ade2],16,17),2) if (se2 == 0) else -1*int(tostr(c1(get(MEM[ade2],16,17))),2)
+    m2 = get(MEM[adm2],16,17) # mantissa
+    m2 = [1] + m2
+    ex = ex1
+    if (ex1 > ex2):
+        while (ex2 < ex1):
+            m2 = shr(m2)
+            ex2 += 1
+    elif (ex1 < ex2):
+        while (ex1 < ex2):
+            m1 = shr(m1)
+            ex1 += 1
+        ex = ex2
+    # subtraction of mantissa
+    lm = len(m1)
+    m3 = [0 for k in range(lm)]
+    z = [0 for k in range(lm)]
+
+    for y in range(lm-1,-1,-1):
+        (m3[y],cry) = s1(m1[y],m2[y],cry)
+    if (m3[0] == 0):
+        # underflow
+        l0 = ldzero(m3)
+        while (l0 > 0):
+            m3 = shl(m3)
+            ex -= 1
+            l0 -= 1
+        m3[0] = 1
+    
+    h = m3[0]
+    m = m3[1:]
+    set(MEM[d],[0,1,0],20,3)
+    set(MEM[d],tobin(d1,9),17,9)
+    set(MEM[d],tobin(d2,9),8,9)
+    set(MEM[d2],m,16,17)
+    set(MEM[d1],tobin(ex,17),16,17)
+    
+    if (h == 0):
+        normal(d)
+    set(MEM[d],[0,0,1],20,3)
+    
+def ADD(d,d1,d2,ad1,ad2,cry=0):
+    adm1 = int(gets(MEM[ad1],8,9),2)
+    adm2 = int(gets(MEM[ad2],8,9),2)
+    sm1 = MEM[adm1][3]
+    sm2 = MEM[adm2][3]
+    if (sm1 == sm2):
+        addf(d,d1,d2,ad1,ad2,cry=0)
+    else:
+        subf(d,d1,d2,ad1,ad2,cry=0)
+        
+def SUB(d,d1,d2,ad1,ad2,cry=0):
+    adm1 = int(gets(MEM[ad1],8,9),2)
+    adm2 = int(gets(MEM[ad2],8,9),2)
+    sm1 = MEM[adm1][3]
+    sm2 = MEM[adm2][3]
+    if (sm1 != sm2):
+        addf(d,d1,d2,ad1,ad2,cry=0)
+    else:
+        subf(d,d1,d2,ad1,ad2,cry=0)
     
 ### TESTS
 
-fsetv(100,110,67.35)
+fsetv(100,110,0.9)
+fsetv(101,115,134.625)
 
-xprint(MEM[100])
+print('Before normalization a1')
 xprint(MEM[110])
 xprint(MEM[111])
-
-pprint(100)
 
 normal(100)
+normal(101)
+
+print('After normalization a1')
 xprint(MEM[110])
 xprint(MEM[111])
-
 pprint(100)
+
+print('After normalization a2')
+xprint(MEM[115])
+xprint(MEM[116])
+pprint(101)
+
+print('Addition')
+addf(105,120,121,100,101)
+xprint(MEM[120])
+xprint(MEM[121])
+pprint(105)
