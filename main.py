@@ -184,14 +184,24 @@ def subf(d,d1,d2,ad1,ad2,cry=0):
     ade2 = int(gets(MEM[ad2],17,9),2)
     adm2 = int(gets(MEM[ad2],8,9),2)
     se1 = MEM[ade1][3]
+    se2 = MEM[ade2][3]
     sm1 = MEM[adm1][3]
     ex1 = int(gets(MEM[ade1],16,17),2) if (se1 == 0) else -1*int(tostr(c1(get(MEM[ade1],16,17))),2)
-    m1 = get(MEM[adm1],16,17) # mantissa
-    m1 = [1] + m1
-    se2 = MEM[ade2][3]
-    sm2 = MEM[adm2][3]
     ex2 = int(gets(MEM[ade2],16,17),2) if (se2 == 0) else -1*int(tostr(c1(get(MEM[ade2],16,17))),2)
+    m1 = get(MEM[adm1],16,17) # mantissa
     m2 = get(MEM[adm2],16,17) # mantissa
+    if ((1+intf(m1))*2**ex1 > (1+intf(m2))*2**ex2):
+        s = 0
+        m1b = 1
+    elif ((1+intf(m1))*2**ex1 < (1+intf(m2))*2**ex2):
+        s = 1
+        m1b = 0
+    else:
+        s = 0
+    m1 = [1] + m1
+    
+    sm2 = MEM[adm2][3]
+    
     m2 = [1] + m2
     ex = ex1
     if (ex1 > ex2):
@@ -207,9 +217,10 @@ def subf(d,d1,d2,ad1,ad2,cry=0):
     lm = len(m1)
     m3 = [0 for k in range(lm)]
     z = [0 for k in range(lm)]
-
+    
     for y in range(lm-1,-1,-1):
         (m3[y],cry) = s1(m1[y],m2[y],cry)
+    
     if (m3[0] == 0):
         # underflow
         l0 = ldzero(m3)
@@ -224,6 +235,7 @@ def subf(d,d1,d2,ad1,ad2,cry=0):
     set(MEM[d],[0,1,0],20,3)
     set(MEM[d],tobin(d1,9),17,9)
     set(MEM[d],tobin(d2,9),8,9)
+    set(MEM[d2],[s],17,1)
     set(MEM[d2],m,16,17)
     set(MEM[d1],tobin(ex,17),16,17)
     
@@ -253,8 +265,8 @@ def SUB(d,d1,d2,ad1,ad2,cry=0):
     
 ### TESTS
 
-fsetv(100,110,0.9)
-fsetv(101,115,134.625)
+fsetv(100,110,9)
+fsetv(101,115,-3.9375)
 
 print('Before normalization a1')
 xprint(MEM[110])
@@ -274,7 +286,7 @@ xprint(MEM[116])
 pprint(101)
 
 print('Addition')
-addf(105,120,121,100,101)
+ADD(105,120,121,100,101)
 xprint(MEM[120])
 xprint(MEM[121])
 pprint(105)
