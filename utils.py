@@ -87,6 +87,12 @@ def intf(s):
 def zero(b):
     for y in range(len(b)):
         b[y] = 0
+        
+def sum(b):
+    r = 0
+    for i in b:
+        r += i
+    return r
 
 def ldzero(b):
     r = 0

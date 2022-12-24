@@ -7,7 +7,8 @@ import random
 MEM = [[0 for i in range(21)] for j in range(8192)]
 
 PC = MEM[0]
-R0 = MEM[1]
+MEM[1] =   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+R0 = MEM[2]
 
 def init():
     for b in MEM:
@@ -277,13 +278,50 @@ def SUB(d,ad1,ad2,cry=0):
         addf(d,d1,d2,ad1,ad2,cry=0)
     else:
         subf(d,d1,d2,ad1,ad2,cry=0)
+        
+def idiv(ad1,ad2):
+    n = get(MEM[ad1],16,17) 
+    d = get(MEM[ad2],16,17)
+    one = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    cry = 0
+    q = [0 for k in range(len(n))]
+    t = [0 for k in range(len(n))]
+    w = copy.deepcopy(n)
+    ld1 = ldzero(n)
+    ld2 = ldzero(d)
+    if (ld1 > ld2):
+        un = ld1-ld2
+        for i in range(un):
+            n = shl(n)
+    elif (ld1 < ld2):
+        un = ld2-ld1
+        for i in range(un):
+            d = shl(d)
+    else:
+        un = 0
+    k = un
+    lw1 = len(n) - ld1
+    while (k>=0):
+        cry = 0
+        q = shl(q)
+        for y in range(len(n)-1,(len(n)-1)-lw1,-1):
+            (t[y], cry) = s1(w[y],d[y],cry)
+        if (cry == 0):
+            q[-1] = 1
+            w = copy.deepcopy(t)
+        k -= 1
+        d = shr(d)
+    set(MEM[ad1],[0,0,0],20,3)
+    set(MEM[ad1],q,16,17)
+    
+
     
 ### TESTS
 
 init()
 
 fsetv(100,110,-9)
-fsetv(101,115,-3.9375)
+fsetv(101,115,-3)
 
 print('Before normalization a1')
 xprint(MEM[110])
@@ -307,3 +345,10 @@ ADD(105,100,101)
 #xprint(MEM[120])
 #xprint(MEM[121])
 pprint(105)
+
+set(MEM[1000],tobin(12,17),16,17)
+set(MEM[1001],tobin(2,17),16,17)
+
+idiv(1000,1001)
+xprint(MEM[1000])
+pprint(1000)
