@@ -150,8 +150,10 @@ def setv(b,v):
         b[i] = v % 2
         v = v // 2
         i -= 1
-    if (s == 1):
-        c1(b)
+    #if (s == 1):
+    #    c1(b)
+    set(b,[0,0,0],20,3)
+    set(b,[s],17,1)
         
 def a1(b1,b2,c):
     r = b1+b2+c

@@ -5,6 +5,7 @@
 - 21 bits word
 - floating point arithmetic
 - integer arithmetic
+- 1-complement (used only internally not in memory)
 - string operation
 - tagged word
 - one generic register R0 at memory address 1
@@ -116,4 +117,9 @@ letter alphabet is used, the other characters remain the same.
 - MVX DDDD,SSSS : move one word from SSSS to DDDD. SSSS is zeroed and the new content in DDDD is (SSSS) XOR (DDDD)
 - NOT AAAA : all bits are inverted at location AAAA
 - MVF DDDD,SSSS : move two words at SSSS,SSSS+1 to DDDD,DDDD+1. SSSS is zeroed and the previous content of DDDD is destroyed
+- CLF : clear the floating point memory area (32-511)
 - FLD AAAA : load a floating point value (in the next two words, exp and mant) at AAAA. The addresses of the exp and mant are handled automatically by the system
+- FADD DDDD,AAAA,BBBB : Add the (AAAA) and (BBBB) and store the result in DDDD
+- FSUB DDDD,AAAA,BBBB : Subtract the (BBBB) from (AAAA) and store the result in DDDD
+- IDIV AAAA,BBBB : Integer Divide (AAAA) by (BBBB) and store the quotient in AAAA and the remainder in R0
+- IMUL AAAA,BBBB : Integer Multiply (AAAA) by (BBBB) and store the result in AAAA (MSB) and R0 (LSB)

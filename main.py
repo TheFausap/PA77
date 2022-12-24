@@ -7,15 +7,16 @@ import random
 MEM = [[0 for i in range(21)] for j in range(8192)]
 
 PC = MEM[0]
-MEM[1] =   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+MEM[1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
 R0 = MEM[2]
+R1 = MEM[3]
 
 def init():
     for b in MEM:
         set(b,[1,1,1],20,3)
         
 def gaddr():
-    ad = random.randint(100,511)
+    ad = random.randint(32,511)
     if (gets(MEM[ad],20,3) != '111'):
         gaddr()
     return ad
@@ -30,8 +31,6 @@ def pprint(ad,f=0):
         m = get(MEM[ad],16,17)
         s = '' if (MEM[ad][3]==0) else '-'
         v = 0
-        #if (s == '-'):
-        #    c1(m)
         if (f == 0):
             v = int(tostr(m),2)
         elif (f == 2):
@@ -282,7 +281,9 @@ def SUB(d,ad1,ad2,cry=0):
 def idiv(ad1,ad2):
     n = get(MEM[ad1],16,17) 
     d = get(MEM[ad2],16,17)
-    one = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    sn = MEM[ad1][3]
+    sd = MEM[ad2][3]
+    one = get(MEM[1],16,17)
     cry = 0
     q = [0 for k in range(len(n))]
     t = [0 for k in range(len(n))]
@@ -290,9 +291,7 @@ def idiv(ad1,ad2):
     ld1 = ldzero(n)
     ld2 = ldzero(d)
     if (ld1 > ld2):
-        un = ld1-ld2
-        for i in range(un):
-            n = shl(n)
+        return
     elif (ld1 < ld2):
         un = ld2-ld1
         for i in range(un):
@@ -311,10 +310,52 @@ def idiv(ad1,ad2):
             w = copy.deepcopy(t)
         k -= 1
         d = shr(d)
+    if (sn == sd):
+        set(MEM[ad1],[0],17,1)
+    else:
+        set(MEM[ad1],[1],17,1)
     set(MEM[ad1],[0,0,0],20,3)
     set(MEM[ad1],q,16,17)
-    
+    set(MEM[2],[0,0,0],20,3)
+    set(MEM[2],w,16,17)
 
+def imul(ad1,ad2):
+    m1 = get(MEM[ad1],16,17) 
+    m2 = get(MEM[ad2],16,17)
+    sn = MEM[ad1][3]
+    sd = MEM[ad2][3]
+    
+    cry = 0
+    ld1 = ldzero(m1)
+    ld2 = ldzero(m2)
+    lw1 = len(m1) - ld1
+    lw2 = len(m2) - ld2
+    lw = lw1 if (lw1 > lw2) else lw2
+    mlpr = [0 for k in range(lw)]
+    mlpd = [0 for k in range(lw)]
+    t = [0 for k in range(lw)]
+    mlpr[lw-lw2:]=m2[ld2:]
+    mlpd[:]=m1[ld1:]
+    q = copy.deepcopy(mlpr)
+    k = lw
+    while (k>0):
+        if (q[-1] == 1):
+            for y in range(len(q)-1,-1,-1):
+                (t[y], cry) = a1(t[y],mlpd[y],cry)
+            q = shr(q)
+            q[0] = t[-1]
+            t = shr(t)
+            t[0] = cry
+            cry = 0
+        else:
+            q = shr(q)
+            q[0] = t[-1]
+            t = shr(t)
+            t[0] = cry
+            cry = 0
+        k -= 1
+    xprint(t)
+    xprint(q)
     
 ### TESTS
 
@@ -346,9 +387,15 @@ ADD(105,100,101)
 #xprint(MEM[121])
 pprint(105)
 
-set(MEM[1000],tobin(12,17),16,17)
-set(MEM[1001],tobin(2,17),16,17)
+#set(MEM[1000],tobin(-12,17),16,17)
+#set(MEM[1001],tobin(5,17),16,17)
+setv(MEM[1000],12)
+setv(MEM[1001],2)
 
-idiv(1000,1001)
-xprint(MEM[1000])
-pprint(1000)
+#idiv(1000,1001)
+#xprint(MEM[1000])
+#pprint(1000)
+#xprint(R0)
+#pprint(2)
+
+imul(1000,1001)
