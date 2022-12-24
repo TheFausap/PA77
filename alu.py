@@ -1,13 +1,12 @@
 from utils import *
 
-one = [0,0,0,1]
-F = [0,0,0,0]
-
 def a74181(S,M,Cn,Ab,Bb):
     A = copy.deepcopy(Ab)
     B = copy.deepcopy(Bb)
     Sv = S[0]*8+S[1]*4+S[2]*2+S[3]
     cry = 0
+    one = [0,0,0,1]
+    F = [0,0,0,0]
 
     if (Sv == 0):
         if (M == 1):
